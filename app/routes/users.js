@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
+const jwt = require('jsonwebtoken')
 const User = require('../models/user')
+require('dotenv').config();
+const secret = process.env.JWT_TOKEN
 /* GET users listing. */
 
 router.post('/create', async (req, res) => {
@@ -14,18 +17,28 @@ router.post('/create', async (req, res) => {
   }
 )
 
-router.get('/login', async (req, res) => {
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body
 
-})
-
-router.get('/:id', function(req, res, next) {
-  const user = findById(req.params.id)
   try {
-    res.status(200).json(user)
+    let user = await User.findOne({email})
+    if(!user)
+      res.status(401).json({error: 'Incorrect email or password'})
+    else{
+      user.isCorrectPassword(password, function(err, same) {
+        if(!same){
+          res.status(401).json({error: 'Incorrect email or password'})
+        }
+        else {
+          const token = jwt.sign({email}, secret, {expiresIn: '1d'})
+          res.json({user: user, token: token})
+        }
+      })
+    }
   } catch (err) {
-    res.status(500).json({err: 'error Finding user'})
+    res.status(500).json({err: 'Internal error, please check your email'})
   }
-});
+})
 
 
 module.exports = router;

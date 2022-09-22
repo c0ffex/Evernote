@@ -1,8 +1,21 @@
 const mongoose = require('mongoose')
 mongoose.Promise = global.Promise
+const dotenv = require('dotenv')
 
-mongoose.connect('mongodb+srv://c0ffex:cdbnDvOuNlPp9p8X@evernote.mzaeixf.mongodb.net/?retryWrites=true&w=majority', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => console.log('connection successful'))
-.catch((err) => console.log(err));
+dotenv.config({ path: './config.env' });
+
+const DB = process.env.DATABASE.replace(
+  '<PASSWORD>',
+  process.env.DATABASE_PASSWORD
+);
+
+mongoose
+  .connect(DB, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true
+  })
+  .then(con => {
+    console.log(con.connections);
+    console.log('DB Connection');
+  }).catch((err) => console.log(err));
