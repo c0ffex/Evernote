@@ -1,7 +1,8 @@
 const express = require('express');
 const path = require('path');
 const logger = require('morgan');
-require('dotenv')
+require('dotenv').config()
+require('./config/database')
 
 const usersRouter = require('./app/routes/users');
 
